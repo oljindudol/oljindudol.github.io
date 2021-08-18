@@ -6,14 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>계산기</title>
+    <script>
+        var timeFormat = /^([0-5][0-9]):([0-5][0-9])$/;
+        var ptime = "2714";
+        var f = "152000"
+        var s = "127000"
+        var t = "102000"
+        var tstack = [];
+
+    </script>
 
     <style>
         #container {
             display: inline-block;
-            width: 40%;
-            height: 70%;
+            width: 45%;
+            height: 75%;
             position: absolute;
-            bottom: 0px;
+            bottom: 5%;
         }
 
         #container>div {
@@ -21,15 +30,43 @@
         }
 
         #display {
-            height: 20%;
+            height: 25%;
             width: 100%;
-            font-size: 100%;
+            font-size: 90px;
             font-weight: bold;
             text-align: right;
             padding-right: 8px;
         }
 
+
+
+        #result {
+            width: 40%;
+            height: 65%;
+            position: absolute;
+            right: 3%;
+            bottom: 6%;
+            text-align-last: end;
+
+        }
+
+        #result>div {
+            width: 100%;
+            height: 25%;
+        }
+
+        #result>div>span,
+        #result>div>button {
+            height: 90%;
+            width: 30%;
+            font-size: xx-large;
+            font-weight: bold;
+        }
+
+
+
         .buttonWrap {
+            font-size: 40px;
             height: 25%;
             display: flex;
             flex-direction: row;
@@ -41,44 +78,177 @@
             height: 100%;
             font-size: 100%;
             padding: 5px;
+            font-weight: bold;
+        }
+
+        .d1 {
+            visibility: hidden;
         }
     </style>
 </head>
 
 <body>
+    <div><span style="font-size: 23px;">진힐라 계산기 for ipad</span><span style="float: right; font-size: 21px;">문의:리부트
+            분할요정<br>1주기:152 2주기:127
+            3주기:102</span></div>
     <div id="container">
         <div>
             <div>
-                <input id="display" type="text" />
+                <input id="display" type="text" disabled />
             </div>
             <div style="height: 80%;">
                 <div class=" buttonWrap">
-                    <button onclick="plusOutput(2)">+2</button>
                     <button onclick="addOutput(7)">7</button>
                     <button onclick="addOutput(8)">8</button>
                     <button onclick="addOutput(9)">9</button>
+                    <button onclick="plusOutput(2)">+2</button>
                 </div>
                 <div class="buttonWrap">
-                    <button onclick="plusOutput(1)">+1</button>
                     <button onclick="addOutput(4)">4</button>
                     <button onclick="addOutput(5)">5</button>
                     <button onclick="addOutput(6)">6</button>
+                    <button onclick="plusOutput(1)">+1</button>
                 </div>
                 <div class="buttonWrap">
-                    <button onclick="minusOutput(1)">-1</button>
                     <button onclick="addOutput(1)">1</button>
                     <button onclick="addOutput(2)">2</button>
                     <button onclick="addOutput(3)">3</button>
+                    <button onclick="minusOutput(1)">-1</button>
                 </div>
                 <div class="buttonWrap">
-                    <button onclick="minusOutput(2)">-2</button>
-                    <button onclick="reset()">clear</button>
-                    <button onclick="addOutput(0)">0</button>
                     <button onclick="del()">←</button>
+                    <button onclick="addOutput(0)">0</button>
+                    <button onclick="reset()">clear</button>
+                    <button onclick="minusOutput(2)">-2</button>
                 </div>
             </div>
         </div>
     </div>
+    <div id="result">
+        <div>
+            <span id="l1">1주기:</span>
+            <button id="b1" onclick="setdisplay(this)"> </button>
+            <button class="d1" onclick="tundo()">dum </button>
+        </div>
+        <div>
+            <span id="l2">2주기:</span>
+            <button id="b2" onclick="setdisplay(this)"> </button>
+            <button class="d1" onclick="tundo()">dum </button>
+        </div>
+
+        <div>
+            <span id="l3">3주기:</span>
+            <button id="b3" onclick="setdisplay(this)"> </button>
+            <button class="d1" onclick="tundo()">dum </button>
+        </div>
+        <div>
+            <span id="l4" style="font-size: ">타임머신:</span>
+            <button id="b4" onclick="tundo()">뒤로 </button>
+            <button id="b5" onclick="tundo()">앞으로 </button>
+        </div>
+    </div>
+    <script>
+
+        function plusOutput(sec) {
+            var nd = new Date(parseInt(ptime.substr(0, 2)) * 1000 * 60 + parseInt(ptime.substr(2, 2)) * 1000);
+            if ((nd - (-sec)) >= 0000) {
+                tstack.push(ptime);
+                ptime = ("00" + Math.floor((nd - (sec * -1)) / (60 * 1000))).substr(-2, 2) + ("00" + Math.floor((nd - (sec * -1)) % (60 * 1000)) / 1000).substr(-2, 2);
+                putnumtoinputbox();
+                showresult();
+                return false;
+            }
+        }
+
+        function checkbackspace(event) {
+            if (event.key == "Backspace") {
+                tstack.push(ptime);
+                ptime = "0" + ptime.slice(0, -1);
+                event.preventDefault();
+                putnumtoinputbox();
+                showresult();
+                return false;
+            }
+            if (event.key >= 0 && event.key <= 9) {
+                tstack.push(ptime);
+                ptime += event.key;
+                ptime = ptime.slice(1);
+                event.preventDefault();
+                putnumtoinputbox();
+                showresult();
+                return false;
+            }
+            var ctrlKey = 17
+            if (event.key == "ArrowUp" || event.key == "+") { plusOutput(1000); }
+            if (event.key == "ArrowDown" || event.key == "-") { plusOutput(-1000); }
+            if (event.key == "ArrowRight") { plusOutput(2000); }
+            if (event.key == "ArrowLeft") { plusOutput(-2000); }
+            if (event.key == "v") { tundo(); }
+            if (event.key == "z" && document.getElementById('b1').style.visibility == "visible") {
+                plusOutput(-f);
+            }
+            if (event.key == "x" && document.getElementById('b2').style.visibility == "visible") {
+                plusOutput(-s);
+            }
+            if (event.key == "c" && document.getElementById('b3').style.visibility == "visible") {
+                plusOutput(-t);
+            }
+
+
+            if (event.ctrlKey && event.key == "z") { document.execCommand("undo", false, null); }
+            return false;
+        }
+
+        function putnumtoinputbox() {
+            document.getElementById('display').value = ptime.substr(0, 2) + ":" + ptime.substr(2, 2);
+        }
+        function showresult() {
+            var res = "";
+            if (timeFormat.test(document.getElementById('display').value)) {
+                var nd = new Date(parseInt(ptime.substr(0, 2)) * 1000 * 60 + parseInt(ptime.substr(2, 2)) * 1000);
+                if ((nd - f) >= 0) {
+                    document.getElementById('b1').innerHTML = Math.floor((nd - f) / (60 * 1000)) + ":" + ("00" + Math.floor((nd - f) % (60 * 1000)) / 1000).substr(-2, 2);
+                    document.getElementById('b1').style.visibility = 'visible';
+                } else { document.getElementById('b1').style.visibility = 'hidden'; }
+                if ((nd - s) >= 0) {
+                    document.getElementById('b2').innerHTML = Math.floor((nd - s) / (60 * 1000)) + ":" + ("00" + Math.floor((nd - s) % (60 * 1000)) / 1000).substr(-2, 2);
+                    document.getElementById('b2').style.visibility = 'visible';
+                } else { document.getElementById('b2').style.visibility = 'hidden'; }
+                if ((nd - t) >= 0) {
+                    document.getElementById('b3').innerHTML = Math.floor((nd - t) / (60 * 1000)) + ":" + ("00" + Math.floor((nd - t) % (60 * 1000)) / 1000).substr(-2, 2);
+                    document.getElementById('b3').style.visibility = 'visible';
+                } else { document.getElementById('b3').style.visibility = 'hidden'; }
+            } else {
+                document.getElementById('b1').style.visibility = 'hidden';
+                document.getElementById('b2').style.visibility = 'hidden';
+                document.getElementById('b3').style.visibility = 'hidden';
+            }
+        }
+        function setdisplay(obj) {
+            tstack.push(ptime);
+            ptime = ("00" + obj.innerHTML.split(':')[0]).substr(-2, 2) + obj.innerHTML.split(':')[1];
+            putnumtoinputbox();
+            showresult();
+        }
+        function tundo() {
+            if (tstack.length > 0) {
+                ptime = tstack.pop();
+                putnumtoinputbox();
+                showresult();
+            }
+        }
+
+
+        putnumtoinputbox();
+        showresult();
+
+
+        display.onblur = function () {
+            display.focus();
+        };
+
+    </script>
+
 </body>
 
 </html>
