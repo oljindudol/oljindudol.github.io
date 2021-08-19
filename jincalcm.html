@@ -8,11 +8,12 @@
     <title>계산기</title>
     <script>
         var timeFormat = /^([0-5][0-9]):([0-5][0-9])$/;
-        var ptime = "2714";
+        var ptime = "3000";
         var f = "152000"
         var s = "127000"
         var t = "102000"
         var tstack = [];
+        var ix;
 
     </script>
 
@@ -22,10 +23,14 @@
             width: 45%;
             height: 75%;
             position: absolute;
-            bottom: 5%;
+            bottom: 7%;
         }
 
         #container>div {
+            border: 3px solid gray;
+        }
+
+        button {
             border: 3px solid gray;
         }
 
@@ -35,17 +40,15 @@
             font-size: 90px;
             font-weight: bold;
             text-align: right;
-            padding-right: 8px;
+            padding-right: 20%;
         }
-
-
 
         #result {
             width: 40%;
             height: 65%;
             position: absolute;
-            right: 3%;
-            bottom: 6%;
+            right: 4%;
+            bottom: 3%;
             text-align-last: end;
 
         }
@@ -61,8 +64,15 @@
             width: 30%;
             font-size: xx-large;
             font-weight: bold;
+            text-align-last: center;
         }
 
+        .l1,
+        .l2,
+        .l3 {
+            position: relative;
+            top: -50%;
+        }
 
 
         .buttonWrap {
@@ -79,16 +89,22 @@
             font-size: 100%;
             padding: 5px;
             font-weight: bold;
+            -webkit-appearance: none;
         }
 
         .d1 {
-            visibility: hidden;
+            float: right;
+            font-size: 25px !important;
+            background-color: transparent;
+            border: none;
+
         }
     </style>
 </head>
 
 <body>
-    <div><span style="font-size: 23px;">진힐라 계산기 for ipad</span><span style="float: right; font-size: 21px;">문의:리부트
+    <div><span style="font-size: 23px;">진힐라 계산기 for ipad</span><span
+            style="position: absolute; right:4%; font-size: 21px;">문의:리부트
             분할요정<br>1주기:152 2주기:127
             3주기:102</span></div>
     <div id="container">
@@ -101,53 +117,126 @@
                     <button onclick="addOutput(7)">7</button>
                     <button onclick="addOutput(8)">8</button>
                     <button onclick="addOutput(9)">9</button>
-                    <button onclick="plusOutput(2)">+2</button>
+                    <button onclick="plusOutput(2000)">+2</button>
                 </div>
                 <div class="buttonWrap">
                     <button onclick="addOutput(4)">4</button>
                     <button onclick="addOutput(5)">5</button>
                     <button onclick="addOutput(6)">6</button>
-                    <button onclick="plusOutput(1)">+1</button>
+                    <button onclick="plusOutput(1000)">+1</button>
                 </div>
                 <div class="buttonWrap">
                     <button onclick="addOutput(1)">1</button>
                     <button onclick="addOutput(2)">2</button>
                     <button onclick="addOutput(3)">3</button>
-                    <button onclick="minusOutput(1)">-1</button>
+                    <button onclick="plusOutput(-1000)">-1</button>
                 </div>
                 <div class="buttonWrap">
-                    <button onclick="del()">←</button>
+                    <button onclick="bkspc()">←</button>
                     <button onclick="addOutput(0)">0</button>
-                    <button onclick="reset()">clear</button>
-                    <button onclick="minusOutput(2)">-2</button>
+                    <button onclick="tundo()">↶</button>
+                    <button onclick="plusOutput(-2000)">-2</button>
                 </div>
             </div>
         </div>
     </div>
+    <button onclick="setclock()"
+        style="position: absolute;font-size: 10px;top: 18%;left: 46%;width: 11%;height: 19%;font-size: 22px;font-weight: bold; border:solid 2px solid 2px darkslategrey">시간설정
+        &시작</button>
+    <button onclick="tundo()"
+        style="position: absolute;font-size: xx-large !important; font-weight: bold !important ;bottom: 3%;left: 46%;width: 11%;height: 15%;font-size: 22px;font-weight: bold;">↷</button>
     <div id="result">
+        <div style="
+    position: relative;
+    top: 9%;
+    right: 19%; ">
+            <span id="l4" style="font-size: 38px;">┗→현재시간:</span>
+            <span id="clock" style="font-size: 42px;">30:00</span>
+        </div>
         <div>
             <span id="l1">1주기:</span>
             <button id="b1" onclick="setdisplay(this)"> </button>
-            <button class="d1" onclick="tundo()">dum </button>
+            <button id="c1" class="d1" value="off" onclick="toggleclock(this.id)">남은시간 </button>
         </div>
         <div>
             <span id="l2">2주기:</span>
             <button id="b2" onclick="setdisplay(this)"> </button>
-            <button class="d1" onclick="tundo()">dum </button>
+            <button id="c2" class="d1" value="off" onclick="toggleclock(this.id)">남은시간 </button>
         </div>
 
         <div>
             <span id="l3">3주기:</span>
             <button id="b3" onclick="setdisplay(this)"> </button>
-            <button class="d1" onclick="tundo()">dum </button>
+            <button id="c3" class="d1" value="off" onclick="toggleclock(this.id)">남은시간 </button>
         </div>
-        <div>
-            <span id="l4" style="font-size: ">타임머신:</span>
-            <button id="b4" onclick="tundo()">뒤로 </button>
-            <button id="b5" onclick="tundo()">앞으로 </button>
-        </div>
+
     </div>
     <script>
+
+        function setclock() {
+            clearInterval();
+            var ttime = parseInt(ptime.substr(0, 2)) * 60 + parseInt(ptime.substr(2, 2));
+            var min = "";
+            var sec = "";
+            var ftime = "";
+            var stime = "";
+            var rtime = "";
+            clearInterval(ix);
+
+            ix = setInterval(function () {
+                ttime--;
+                min = parseInt(ttime / 60);
+                sec = ttime % 60;
+                document.getElementById("clock").innerHTML = min + ":" + ("00" + sec).substr(-2, 2);
+                if (ttime < 0) {
+                    clearInterval(ix);
+                }
+                //c1
+                if (document.getElementById("c1").getAttribute("value") == "on" && document.getElementById("b1").style.visibility == "visible") {
+                    ftime = parseInt(document.getElementById("b1").innerHTML.split(":")[0]) * 60 + parseInt(document.getElementById("b1").innerHTML.split(":")[1])
+
+                    if (ttime > ftime) {
+                        document.getElementById("c1").innerHTML = parseInt((ttime - ftime) / 60) + ":" + ("00" + ((ttime - ftime) % 60)).substr(-2, 2);
+                    } else {
+                        document.getElementById("c1").innerHTML = "0:00";
+                    }
+                }
+                //c2
+                if (document.getElementById("c2").getAttribute("value") == "on" && document.getElementById("b2").style.visibility == "visible") {
+                    stime = parseInt(document.getElementById("b2").innerHTML.split(":")[0]) * 60 + parseInt(document.getElementById("b2").innerHTML.split(":")[1])
+
+                    if (ttime > stime) {
+                        document.getElementById("c2").innerHTML = parseInt((ttime - stime) / 60) + ":" + ("00" + ((ttime - stime) % 60)).substr(-2, 2);
+                    } else {
+                        document.getElementById("c2").innerHTML = "0:00";
+                    }
+                }
+                //c3
+                if (document.getElementById("c3").getAttribute("value") == "on" && document.getElementById("b3").style.visibility == "visible") {
+                    rtime = parseInt(document.getElementById("b3").innerHTML.split(":")[0]) * 60 + parseInt(document.getElementById("b3").innerHTML.split(":")[1])
+
+                    if (ttime > rtime) {
+                        document.getElementById("c3").innerHTML = parseInt((ttime - rtime) / 60) + ":" + ("00" + ((ttime - rtime) % 60)).substr(-2, 2);
+                    } else {
+                        document.getElementById("c3").innerHTML = "0:00";
+                    }
+                }
+
+
+            }, 1000);
+        }
+        function toggleclock(id) {
+            if (document.getElementById(id).getAttribute("value") == "off") {
+                document.getElementById(id).setAttribute("value", "on");
+                document.getElementById(id).innerHTML = "";
+                return 1;
+            }
+            if (document.getElementById(id).getAttribute("value") == "on") {
+                document.getElementById(id).setAttribute("value", "off");
+                document.getElementById(id).innerHTML = "남은시간";
+                return 1;
+            }
+        }
 
         function plusOutput(sec) {
             var nd = new Date(parseInt(ptime.substr(0, 2)) * 1000 * 60 + parseInt(ptime.substr(2, 2)) * 1000);
@@ -160,70 +249,60 @@
             }
         }
 
-        function checkbackspace(event) {
-            if (event.key == "Backspace") {
-                tstack.push(ptime);
-                ptime = "0" + ptime.slice(0, -1);
-                event.preventDefault();
-                putnumtoinputbox();
-                showresult();
-                return false;
-            }
-            if (event.key >= 0 && event.key <= 9) {
-                tstack.push(ptime);
-                ptime += event.key;
-                ptime = ptime.slice(1);
-                event.preventDefault();
-                putnumtoinputbox();
-                showresult();
-                return false;
-            }
-            var ctrlKey = 17
-            if (event.key == "ArrowUp" || event.key == "+") { plusOutput(1000); }
-            if (event.key == "ArrowDown" || event.key == "-") { plusOutput(-1000); }
-            if (event.key == "ArrowRight") { plusOutput(2000); }
-            if (event.key == "ArrowLeft") { plusOutput(-2000); }
-            if (event.key == "v") { tundo(); }
-            if (event.key == "z" && document.getElementById('b1').style.visibility == "visible") {
-                plusOutput(-f);
-            }
-            if (event.key == "x" && document.getElementById('b2').style.visibility == "visible") {
-                plusOutput(-s);
-            }
-            if (event.key == "c" && document.getElementById('b3').style.visibility == "visible") {
-                plusOutput(-t);
-            }
-
-
-            if (event.ctrlKey && event.key == "z") { document.execCommand("undo", false, null); }
+        function bkspc() {
+            tstack.push(ptime);
+            ptime = "0" + ptime.slice(0, -1);
+            putnumtoinputbox();
+            showresult();
             return false;
         }
+
+        function addOutput(vnm) {
+            tstack.push(ptime);
+            ptime += vnm;
+            ptime = ptime.slice(1);
+            putnumtoinputbox();
+            showresult();
+            return false;
+        }
+
+
+
 
         function putnumtoinputbox() {
             document.getElementById('display').value = ptime.substr(0, 2) + ":" + ptime.substr(2, 2);
         }
         function showresult() {
+
             var res = "";
-            if (timeFormat.test(document.getElementById('display').value)) {
-                var nd = new Date(parseInt(ptime.substr(0, 2)) * 1000 * 60 + parseInt(ptime.substr(2, 2)) * 1000);
-                if ((nd - f) >= 0) {
-                    document.getElementById('b1').innerHTML = Math.floor((nd - f) / (60 * 1000)) + ":" + ("00" + Math.floor((nd - f) % (60 * 1000)) / 1000).substr(-2, 2);
-                    document.getElementById('b1').style.visibility = 'visible';
-                } else { document.getElementById('b1').style.visibility = 'hidden'; }
-                if ((nd - s) >= 0) {
-                    document.getElementById('b2').innerHTML = Math.floor((nd - s) / (60 * 1000)) + ":" + ("00" + Math.floor((nd - s) % (60 * 1000)) / 1000).substr(-2, 2);
-                    document.getElementById('b2').style.visibility = 'visible';
-                } else { document.getElementById('b2').style.visibility = 'hidden'; }
-                if ((nd - t) >= 0) {
-                    document.getElementById('b3').innerHTML = Math.floor((nd - t) / (60 * 1000)) + ":" + ("00" + Math.floor((nd - t) % (60 * 1000)) / 1000).substr(-2, 2);
-                    document.getElementById('b3').style.visibility = 'visible';
-                } else { document.getElementById('b3').style.visibility = 'hidden'; }
-            } else {
-                document.getElementById('b1').style.visibility = 'hidden';
+            if (ptime > "2946") {
+                document.getElementById('b1').innerHTML = "27:14";
+                document.getElementById('b1').style.visibility = 'visible';
                 document.getElementById('b2').style.visibility = 'hidden';
                 document.getElementById('b3').style.visibility = 'hidden';
+            } else {
+                if (timeFormat.test(document.getElementById('display').value)) {
+                    var nd = new Date(parseInt(ptime.substr(0, 2)) * 1000 * 60 + parseInt(ptime.substr(2, 2)) * 1000);
+                    if ((nd - f) >= 0) {
+                        document.getElementById('b1').innerHTML = Math.floor((nd - f) / (60 * 1000)) + ":" + ("00" + Math.floor((nd - f) % (60 * 1000)) / 1000).substr(-2, 2);
+                        document.getElementById('b1').style.visibility = 'visible';
+                    } else { document.getElementById('b1').style.visibility = 'hidden'; }
+                    if ((nd - s) >= 0) {
+                        document.getElementById('b2').innerHTML = Math.floor((nd - s) / (60 * 1000)) + ":" + ("00" + Math.floor((nd - s) % (60 * 1000)) / 1000).substr(-2, 2);
+                        document.getElementById('b2').style.visibility = 'visible';
+                    } else { document.getElementById('b2').style.visibility = 'hidden'; }
+                    if ((nd - t) >= 0) {
+                        document.getElementById('b3').innerHTML = Math.floor((nd - t) / (60 * 1000)) + ":" + ("00" + Math.floor((nd - t) % (60 * 1000)) / 1000).substr(-2, 2);
+                        document.getElementById('b3').style.visibility = 'visible';
+                    } else { document.getElementById('b3').style.visibility = 'hidden'; }
+                } else {
+                    document.getElementById('b1').style.visibility = 'hidden';
+                    document.getElementById('b2').style.visibility = 'hidden';
+                    document.getElementById('b3').style.visibility = 'hidden';
+                }
             }
         }
+
         function setdisplay(obj) {
             tstack.push(ptime);
             ptime = ("00" + obj.innerHTML.split(':')[0]).substr(-2, 2) + obj.innerHTML.split(':')[1];
@@ -238,14 +317,15 @@
             }
         }
 
-
+        ptime = "2714";
+        putnumtoinputbox();
+        showresult();
+        ptime = "3000";
         putnumtoinputbox();
         showresult();
 
 
-        display.onblur = function () {
-            display.focus();
-        };
+
 
     </script>
 
