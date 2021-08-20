@@ -148,8 +148,20 @@
     <div id="result">
         <div style="
     position: relative;
-    top: 9%;
-    right: 19%; ">
+    top: -4%;
+    right: 11%; ">
+            <div>
+                <span"><button onclick="tm()" style="
+    font-size: xx-large;
+    font-weight: bold;
+">　-1　</button> <button onclick="tt()" style="
+    font-size: xx-large;
+    font-weight: bold;
+">　ll　</button> <button onclick="tp()" style="
+    font-size: xx-large;
+    font-weight: bold;
+">　+1　</button></span>
+            </div>
             <span id="l4" style="font-size: 38px;">┗→현재시간:</span>
             <span id="clock" style="font-size: 42px;">30:00</span>
         </div>
@@ -172,15 +184,13 @@
 
     </div>
     <script>
-
+        var ttime = "1800"
         function setclock() {
             clearInterval();
-            var ttime = parseInt(ptime.substr(0, 2)) * 60 + parseInt(ptime.substr(2, 2));
+            ttime = parseInt(ptime.substr(0, 2)) * 60 + parseInt(ptime.substr(2, 2));
             var min = "";
             var sec = "";
             var ftime = "";
-            var stime = "";
-            var rtime = "";
             clearInterval(ix);
 
             ix = setInterval(function () {
@@ -188,47 +198,36 @@
                 min = parseInt(ttime / 60);
                 sec = ttime % 60;
                 document.getElementById("clock").innerHTML = min + ":" + ("00" + sec).substr(-2, 2);
+                updateclock();
                 if (ttime < 0) {
                     clearInterval(ix);
                 }
-                //c1
-                if (document.getElementById("c1").getAttribute("value") == "on" && document.getElementById("b1").style.visibility == "visible") {
-                    ftime = parseInt(document.getElementById("b1").innerHTML.split(":")[0]) * 60 + parseInt(document.getElementById("b1").innerHTML.split(":")[1])
-
-                    if (ttime > ftime) {
-                        document.getElementById("c1").innerHTML = parseInt((ttime - ftime) / 60) + ":" + ("00" + ((ttime - ftime) % 60)).substr(-2, 2);
-                    } else {
-                        document.getElementById("c1").innerHTML = "0:00";
-                    }
-                }
-                //c2
-                if (document.getElementById("c2").getAttribute("value") == "on" && document.getElementById("b2").style.visibility == "visible") {
-                    stime = parseInt(document.getElementById("b2").innerHTML.split(":")[0]) * 60 + parseInt(document.getElementById("b2").innerHTML.split(":")[1])
-
-                    if (ttime > stime) {
-                        document.getElementById("c2").innerHTML = parseInt((ttime - stime) / 60) + ":" + ("00" + ((ttime - stime) % 60)).substr(-2, 2);
-                    } else {
-                        document.getElementById("c2").innerHTML = "0:00";
-                    }
-                }
-                //c3
-                if (document.getElementById("c3").getAttribute("value") == "on" && document.getElementById("b3").style.visibility == "visible") {
-                    rtime = parseInt(document.getElementById("b3").innerHTML.split(":")[0]) * 60 + parseInt(document.getElementById("b3").innerHTML.split(":")[1])
-
-                    if (ttime > rtime) {
-                        document.getElementById("c3").innerHTML = parseInt((ttime - rtime) / 60) + ":" + ("00" + ((ttime - rtime) % 60)).substr(-2, 2);
-                    } else {
-                        document.getElementById("c3").innerHTML = "0:00";
-                    }
-                }
-
-
             }, 1000);
         }
+
+
+
+        function updateclock() {
+
+            for (var i = 1; i < 4; i++) {
+                if (document.getElementById("c" + i).getAttribute("value") == "off") { continue; }
+                if (document.getElementById("b" + i).style.visibility == "visible") {
+                    var ftime = parseInt(document.getElementById("b" + i).innerHTML.split(":")[0]) * 60 + parseInt(document.getElementById("b" + i).innerHTML.split(":")[1])
+                    if (ttime > ftime) {
+                        document.getElementById("c" + i).innerHTML = parseInt((ttime - ftime) / 60) + ":" + ("00" + ((ttime - ftime) % 60)).substr(-2, 2);
+                    } else {
+                        document.getElementById("c" + i).innerHTML = "0:00";
+                    }
+                }
+            }
+        }
+
+
+
         function toggleclock(id) {
             if (document.getElementById(id).getAttribute("value") == "off") {
                 document.getElementById(id).setAttribute("value", "on");
-                document.getElementById(id).innerHTML = "";
+                updateclock();
                 return 1;
             }
             if (document.getElementById(id).getAttribute("value") == "on") {
