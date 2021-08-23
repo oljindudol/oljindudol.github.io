@@ -13,6 +13,7 @@
         var s = "127000"
         var t = "102000"
         var tstack = [];
+        var tstackr = [];
         var ix;
 
     </script>
@@ -143,7 +144,7 @@
     <button onclick="setclock()"
         style="position: absolute;font-size: 10px;top: 18%;left: 46%;width: 11%;height: 19%;font-size: 22px;font-weight: bold; border:solid 2px solid 2px darkslategrey">시간설정
         &시작</button>
-    <button onclick="tundo()"
+    <button onclick="tredo()"
         style="position: absolute;font-size: xx-large !important; font-weight: bold !important ;bottom: 3%;left: 46%;width: 11%;height: 15%;font-size: 22px;font-weight: bold;">↷</button>
     <div id="result">
         <div style="
@@ -151,13 +152,13 @@
     top: -4%;
     right: 11%; ">
             <div>
-                <span"><button onclick="tm()" style="
+                <span"><button onclick="td(-1)" style="
     font-size: xx-large;
     font-weight: bold;
-">　-1　</button> <button onclick="tt()" style="
+">　-1　</button> <button id="pcbutton" value="p" onclick="pc()" style="
     font-size: xx-large;
     font-weight: bold;
-">　ll　</button> <button onclick="tp()" style="
+">&nbsp;&nbsp;&nbsp;l▶&nbsp;&nbsp;</button> <button onclick="td(1)" style="
     font-size: xx-large;
     font-weight: bold;
 ">　+1　</button></span>
@@ -184,14 +185,59 @@
 
     </div>
     <script>
-        var ttime = "1800"
+        var ttime = 1800
+
+        function pc() {
+            if (document.getElementById("pcbutton").getAttribute("value") == "r") {
+                clearInterval(ix);
+                document.getElementById("pcbutton").innerHTML = "&nbsp;&nbsp;&nbsp;l▶&nbsp;&nbsp;"
+                document.getElementById("pcbutton").setAttribute("value", "p")
+            } else {
+                document.getElementById("pcbutton").innerHTML = "　ll　"
+                var xtime = document.getElementById("clock").innerHTML;
+                ttime = parseInt(xtime.split("':'")[0]) * 60 + parseInt(xtime.split(":")[1]);
+                var min = "";
+                var sec = "";
+                var ftime = "";
+                clearInterval(ix);
+
+                ix = setInterval(function () {
+                    ttime--;
+                    min = parseInt(ttime / 60);
+                    sec = ttime % 60;
+                    document.getElementById("clock").innerHTML = min + ":" + ("00" + sec).substr(-2, 2);
+                    updateclock();
+                    if (ttime < 0) {
+                        clearInterval(ix);
+                    }
+                }, 1000);
+                document.getElementById("pcbutton").setAttribute("value", "r");
+            }
+
+        }
+
+        function td(dti) {
+            ttime = ttime + dti;
+
+            if (ttime < 0) {
+                clearInterval(ix);
+            } else {
+                min = parseInt(ttime / 60);
+                sec = ttime % 60;
+                document.getElementById("clock").innerHTML = min + ":" + ("00" + sec).substr(-2, 2);
+                updateclock();
+            }
+
+        }
+
         function setclock() {
-            clearInterval();
             ttime = parseInt(ptime.substr(0, 2)) * 60 + parseInt(ptime.substr(2, 2));
             var min = "";
             var sec = "";
             var ftime = "";
             clearInterval(ix);
+            document.getElementById("pcbutton").innerHTML = "　ll　"
+            document.getElementById("pcbutton").setAttribute("value", "r")
 
             ix = setInterval(function () {
                 ttime--;
@@ -218,6 +264,8 @@
                     } else {
                         document.getElementById("c" + i).innerHTML = "0:00";
                     }
+                } else {
+                    document.getElementById("c" + i).innerHTML = "0:00";
                 }
             }
         }
@@ -233,6 +281,7 @@
             if (document.getElementById(id).getAttribute("value") == "on") {
                 document.getElementById(id).setAttribute("value", "off");
                 document.getElementById(id).innerHTML = "남은시간";
+                updateclock();
                 return 1;
             }
         }
@@ -241,27 +290,33 @@
             var nd = new Date(parseInt(ptime.substr(0, 2)) * 1000 * 60 + parseInt(ptime.substr(2, 2)) * 1000);
             if ((nd - (-sec)) >= 0000) {
                 tstack.push(ptime);
+                tstackr = [];
                 ptime = ("00" + Math.floor((nd - (sec * -1)) / (60 * 1000))).substr(-2, 2) + ("00" + Math.floor((nd - (sec * -1)) % (60 * 1000)) / 1000).substr(-2, 2);
                 putnumtoinputbox();
                 showresult();
+                updateclock();
                 return false;
             }
         }
 
         function bkspc() {
             tstack.push(ptime);
+            tstackr = [];
             ptime = "0" + ptime.slice(0, -1);
             putnumtoinputbox();
             showresult();
+            updateclock();
             return false;
         }
 
         function addOutput(vnm) {
             tstack.push(ptime);
+            tstackr = [];
             ptime += vnm;
             ptime = ptime.slice(1);
             putnumtoinputbox();
             showresult();
+            updateclock();
             return false;
         }
 
@@ -304,15 +359,27 @@
 
         function setdisplay(obj) {
             tstack.push(ptime);
+            tstackr = [];
             ptime = ("00" + obj.innerHTML.split(':')[0]).substr(-2, 2) + obj.innerHTML.split(':')[1];
             putnumtoinputbox();
             showresult();
         }
         function tundo() {
             if (tstack.length > 0) {
+                tstackr.push(ptime);
                 ptime = tstack.pop();
                 putnumtoinputbox();
                 showresult();
+                updateclock();
+            }
+        }
+        function tredo() {
+            if (tstackr.length > 0) {
+                tstack.push(ptime);
+                ptime = tstackr.pop();
+                putnumtoinputbox();
+                showresult();
+                updateclock();
             }
         }
 
